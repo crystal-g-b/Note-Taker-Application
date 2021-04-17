@@ -1,4 +1,7 @@
 // require fs, path, require('uuid/v1'), and express
+const fs = require('fs');
+const path = require('path');
+
 // create a variable called router and set it to express.router()
 
 // create a variable called dbPath and set it to the path to the db.json file.

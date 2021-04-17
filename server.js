@@ -1,4 +1,6 @@
 // require express and your two routes files
+const express = require('express');
+const path = require('path');
 
 // Initialize the app and create a port
 
