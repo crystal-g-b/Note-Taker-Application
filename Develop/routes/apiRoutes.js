@@ -1,6 +1,7 @@
 // require fs, path, require('uuid/v1'), and express
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
 
 // create a variable called router and set it to express.router()
 
@@ -38,5 +39,7 @@ const path = require('path');
 		// use the fs.writeFile method to write to the db.json file using the filtered, stringified notes
 			// if there is an error respond with a 500 status (res.status) and the error as json (res.json)
 			// otherwise, return { ok: true } using res.json
-
+app.delete('/api/notes/:id', (req, res){
+	let id = req.params.id.toString();
+})
 // export the router
