@@ -1,45 +1,59 @@
-// require fs, path, require('uuid/v1'), and express
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
 
-// create a variable called router and set it to express.router()
+const fs = require("fs");
+const notesData = require("../db/db.json");
 
-// create a variable called dbPath and set it to the path to the db.json file.
-// HINT: this is done using the path.join method, __dirname, and the realtive path from this file to the db.json file
+module.exports = function(app){
 
-// create a get route using the router
-// the endpoint should be '/notes'
-// in the callback function
-	// use the fs.readFile method to read the db.json file
-	// if there is an error respond with a 500 status (res.status) and the error as json (res.json)
-	// otherwise, parse the json returned and send it using the res.json method
+    function writeToDb(notes){
+        notes = JSON.stringify(notes);
+        console.log (notes);
+        fs.writeFileSync("./db/db.json", notes, function(err){
+            if (err) {
+                return console.log(err);
+            }
+        });
+    }
 
-// create a post route using the router
-// the endpoint should be '/notes'
-// in the callback function
-	// use the fs.readFile method to read the db.json file
-		// if there is an error respond with a 500 status (res.status) and the error as json (res.json)
-		// otherwise, parse the json returned
-		// use the req.body and the uuvid1() to create a new object with the values sent in the req and a unique id
-		// add the new note you just created to the notes returned from readFile and stringify it to json
-		// use the fs.writeFile method to write to the db.json file using the updated, stringified notes
-			// if there is an error respond with a 500 status (res.status) and the error as json (res.json)
-			// otherwise, return the new note you created using res.json
+	//GET method
+    app.get("/api/notes", function(req, res){
+        res.json(notesData);
+    });
 
-// create a delete route using the router
-// the endpoint should be '/notes/:id'
-// in the callback function
-// get the id sent in the request using from req.params
-	// use the fs.readFile method to read the db.json file
-		// if there is an error respond with a 500 status (res.status) and the error as json (res.json)
-		// otherwise, parse the json returned
-		// filter the notes returned by the readFile method to include all of the entries whose id doesn't match the id sent in the request .filter()
-		// stringify the filtered notes
-		// use the fs.writeFile method to write to the db.json file using the filtered, stringified notes
-			// if there is an error respond with a 500 status (res.status) and the error as json (res.json)
-			// otherwise, return { ok: true } using res.json
-app.delete('/api/notes/:id', (req, res){
-	let id = req.params.id.toString();
-})
-// export the router
+	//POST method
+    app.post("/api/notes", function(req, res){
+
+        if (notesData.length == 0){
+            req.body.id = "0";
+        } else{
+            req.body.id = JSON.stringify(JSON.parse(notesData[notesData.length - 1].id) + 1);
+        }
+        
+        notesData.push(req.body);
+
+        writeToDb(notesData);
+
+        res.json(req.body);
+    });
+
+    // DELETE Method
+    app.delete("/api/notes/:id", function(req, res){
+        
+        let id = req.params.id.toString();
+        console.log(id);
+
+        for (i=0; i < notesData.length; i++){
+           
+            if (notesData[i].id == id){
+                console.log("match!");
+                
+                res.send(notesData[i]);
+
+                notesData.splice(i,1);
+                break;
+            }
+        }
+
+        writeToDb(notesData);
+
+    });
+};
